@@ -1,6 +1,8 @@
-#include <iostream>
+#include <SFML/Graphics.hpp>
+#include "source/Game.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+
+    Game game(500, 500, "Tetris");
     return 0;
 }

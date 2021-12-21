@@ -1,24 +1,35 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Game.h, 2021-12-15 - 2021-12-15
+// Game.h, 2021-12-17 - 2021-12-17
 // kortfattat vad filen innehåller
 //
 
 #ifndef TETRIS_GAME_H
 #define TETRIS_GAME_H
 
-
 #include <SFML/Graphics.hpp>
+#include "Clock.h"
+#include "shapes/Shape.h"
+#include "Grid.h"
 
 class Game {
 private:
-    sf::RenderWindow window;
+    //Defaults
+    const size_t DEFAULT_ROWS = 10;
+    const size_t DEFAULT_COLUMNS = 30;
 
+    Clock clock;
+    std::vector<Shape> shape_queue;
+    Grid grid;
 
 public:
-    Game(int width, int height, std::string title);
-    void run();
+    Game();
+    Game(size_t rows, size_t columns);
+
+    //Draw
+    void draw(sf::RenderWindow& window);
+
 };
 
 

@@ -1,8 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include "source/Game.h"
+#include "source/Window.h"
 
 int main() {
 
-    Game game(500, 500, "Tetris");
+    Window game(500, 500, "Tetris");
+    game.run();
     return 0;
 }

@@ -31,7 +31,6 @@ void Window::run(){
             case PAUSE:
                 break;
         }
-
         renderWindow.display();
     }
 }

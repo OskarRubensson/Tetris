@@ -14,7 +14,6 @@
 const float SQUARE_SIZE = 10;
 
 class Shape {
-    sf::Vector2<float> position;
     sf::Color color;
     std::vector<std::vector<sf::RectangleShape> > squares;
 
@@ -25,7 +24,7 @@ public:
     Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color, sf::Vector2<float> position);
 
     //Getters
-    std::vector<std::vector<sf::RectangleShape> >* getSquares();
+    std::vector<std::vector<sf::RectangleShape> >& getSquares();
     std::vector<int> getBottomSquaresRow();
     sf::Vector2<int> getRelativeCenterPosition(const sf::RectangleShape& square);
 

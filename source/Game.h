@@ -16,8 +16,8 @@
 class Game {
 private:
     //Defaults
-    const size_t DEFAULT_ROWS = 10;
-    const size_t DEFAULT_COLUMNS = 30;
+    const size_t DEFAULT_ROWS = 20;
+    const size_t DEFAULT_COLUMNS = 20;
 
     Clock clock;
     std::vector<Shape> shape_queue;

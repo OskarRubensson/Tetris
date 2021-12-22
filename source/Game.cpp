@@ -24,6 +24,9 @@ grid(DEFAULT_ROWS, DEFAULT_COLUMNS){
 Game::Game(size_t rows, size_t columns):
 clock(250),
 grid(rows, columns){
+    /*shape_queue.push_back(Shape_S());
+    auto& s = *(shape_queue.end() - 1);
+    grid.insert(s, {10, 10});*/
 }
 
 static bool addNewObj = true;
@@ -32,13 +35,13 @@ void Game::draw(sf::RenderWindow& window){
     //If clockrate has passed, move
     if (clock.hasTicked()){
         if (addNewObj || counter % 20 == 0){
-            std::vector<Shape> miniVector = {Shape_S(), Shape_L(), Shape_T(), Shape_SQR()};
-            shape_queue.push_back(miniVector.at(counter % 4));
+            shape_queue.push_back(Shape_S());
+            grid.insert(*shape_queue.rbegin(), {5, 5});
             addNewObj = false;
             counter = 0;
         }
+
         auto& s = *(shape_queue.end() - 1);
-        grid.insert(s, {5, 0});
         if (!grid.move(s, {0, 1}))
             addNewObj = true;
         counter++;

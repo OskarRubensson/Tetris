@@ -8,19 +8,19 @@
 #include "Shape.h"
 #include <algorithm>
 #include <cmath>       /* round */
+#include <utility>
 
 
 Shape::Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color):
-squares(squares),
+squares(std::move(squares)),
 color(color){
     initProperties();
 }
 
 
 Shape::Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color, sf::Vector2<float> position):
-squares(squares),
-color(color),
-position(position){
+squares(std::move(squares)),
+color(color){
     initProperties();
 }
 
@@ -30,8 +30,8 @@ void Shape::initProperties() {
         int col_index = 0;
         std::for_each(rows.begin(), rows.end(), [&](sf::RectangleShape& square){
             if (square.getSize().x > 0 || square.getSize().y > 0){
-                square.setPosition((float)col_index * SQUARE_SIZE + 100,
-                                   (float)row_index * SQUARE_SIZE + 100);
+                square.setPosition((float)col_index * SQUARE_SIZE,
+                                   (float)row_index * SQUARE_SIZE);
                 square.setFillColor(color);
             }
             ++col_index;
@@ -40,8 +40,8 @@ void Shape::initProperties() {
     });
 }
 
-std::vector<std::vector<sf::RectangleShape> >* Shape::getSquares() {
-    return &squares;
+std::vector<std::vector<sf::RectangleShape> >& Shape::getSquares() {
+    return squares;
 }
 
 std::vector<int> Shape::getBottomSquaresRow() {
@@ -89,10 +89,19 @@ void Shape::draw(sf::RenderWindow &window) {
 
 void Shape::move(sf::Vector2<int> direction){
     sf::Vector2<float> parsedDirection = {(float)direction.x * SQUARE_SIZE,
-                                          (float)direction.y *SQUARE_SIZE};
+                                          (float)direction.y * SQUARE_SIZE};
 
     int row_index = 0;
-    std::for_each(squares.begin(), squares.end(), [&](std::vector<sf::RectangleShape>& rows){
+    for(std::vector<sf::RectangleShape>& rows: squares){
+        int col_index = 0;
+        for( sf::RectangleShape& square : rows){
+            if (square.getSize().x > 0 || square.getSize().y > 0)
+                square.move(parsedDirection);
+            col_index++;
+        }
+    }
+
+    /*std::for_each(squares.begin(), squares.end(), [&](std::vector<sf::RectangleShape>& rows){
         int col_index = 0;
         std::for_each(rows.begin(), rows.end(), [&](sf::RectangleShape& square){
             if (square.getSize().x > 0 || square.getSize().y > 0)
@@ -100,5 +109,5 @@ void Shape::move(sf::Vector2<int> direction){
             col_index++;
         });
         row_index++;
-    });
+    });*/
 }

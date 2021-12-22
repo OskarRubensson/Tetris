@@ -16,14 +16,14 @@
 
 struct node {
     Shape* shape = nullptr;
-    sf::RectangleShape* object;
+    sf::RectangleShape* object = nullptr;
 
-    node() = default;
+    node():shape(), object() {};
     node(Shape& shape, sf::RectangleShape& object):shape(&shape), object(&object) {};
 };
 
 class Grid {
-    std::vector<std::unique_ptr<node> > grid;
+    std::vector<node> grid;
     const size_t WIDTH;
     const size_t DEFAULT_X;
     const size_t DEFAULT_Y;
@@ -35,8 +35,8 @@ public:
     void insert(Shape& shape, sf::Vector2<float> position);
     bool move(sf::Vector2<int> position, sf::Vector2<int> direction);
     bool move(Shape& shape, sf::Vector2<int> direction);
-    std::unique_ptr<node>* get(sf::Vector2<int> position);
-    sf::Vector2<int> get(std::unique_ptr<node>& n_ptr);
+    node* get(sf::Vector2<int> position);
+    sf::Vector2<int> get(node& n_ptr);
 
 };
 

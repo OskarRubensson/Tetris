@@ -11,7 +11,7 @@
 Grid::Grid(size_t rows, size_t columns):
 grid(rows * columns),
 WIDTH(columns),
-DEFAULT_X(rows / 2),
+DEFAULT_X(columns / 2),
 DEFAULT_Y(0){
 }
 
@@ -48,8 +48,8 @@ bool Grid::move(sf::Vector2<int> position, sf::Vector2<int> direction) {
         }
         colIndex++;
     }
-    auto from = grid.begin() + position.y * WIDTH + position.x;
-    auto to = grid.begin() + (position.y + direction.y) * WIDTH + (position.x + direction.x);
+    auto from = grid.begin() + (position.y * WIDTH) + position.x;
+    auto to = from + (direction.y * WIDTH) + direction.x;
 
     if (to >= grid.end())
         return false;
@@ -62,7 +62,7 @@ bool Grid::move(sf::Vector2<int> position, sf::Vector2<int> direction) {
 bool Grid::move(Shape& n, sf::Vector2<int> direction) {
     bool moved = false;
     std::for_each(grid.begin(), grid.end(), [&](node& n_ptr){
-        if (n_ptr.shape == &n){
+        if (n_ptr.shape == &n && !moved){
             moved = move(get(n_ptr), direction);
             return false; //Break iteration
         }

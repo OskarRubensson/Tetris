@@ -32,11 +32,23 @@ class Grid {
 public:
     Grid(size_t rows, size_t columns);
 
-    void insert(Shape& shape, sf::Vector2<float> position);
+    void insert(Shape& shape, sf::Vector2<int> position = {3, 3});
     bool move(sf::Vector2<int> position, sf::Vector2<int> direction);
     bool move(Shape& shape, sf::Vector2<int> direction);
     node* get(sf::Vector2<int> position);
     sf::Vector2<int> get(node& n_ptr);
+
+    template<typename T>
+    sf::Vector2<int> indexToVector(T index) const{
+        int x = index % WIDTH;
+        int y = index / WIDTH;
+        return {x, y};
+    }
+
+    template<typename T>
+    int vectorToIndex(sf::Vector2<T> position) const{
+        return position.y * WIDTH + position.x;
+    }
 
 };
 

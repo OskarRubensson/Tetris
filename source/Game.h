@@ -16,12 +16,15 @@
 class Game {
 private:
     //Defaults
-    const size_t DEFAULT_ROWS = 20;
-    const size_t DEFAULT_COLUMNS = 20;
+    const size_t DEFAULT_ROWS = 40;
+    const size_t DEFAULT_COLUMNS = 40;
 
     Clock clock;
     std::vector<Shape> shape_queue;
     Grid grid;
+
+    bool addNewObj = true;
+    int counter = 0;
 
 public:
     Game();

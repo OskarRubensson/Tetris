@@ -11,7 +11,7 @@
 
 #include <SFML/Graphics.hpp>
 
-const float SQUARE_SIZE = 10;
+const float SQUARE_SIZE = 25;
 
 class Shape {
     sf::Color color;

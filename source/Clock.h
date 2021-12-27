@@ -15,6 +15,7 @@
 class Clock {
     const int DEFAULT_CLOCKRATE = 1000;
     int clockrate;
+    bool running;
     std::chrono::time_point<std::chrono::steady_clock> last_clock;
 
 public:
@@ -22,6 +23,9 @@ public:
     Clock(int clockrate);
 
     bool hasTicked();
+    void stop();
+    void start();
+
 };
 
 

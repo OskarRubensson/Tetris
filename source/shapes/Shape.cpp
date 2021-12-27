@@ -8,7 +8,6 @@
 #include "Shape.h"
 #include <algorithm>
 #include <cmath>       /* round */
-#include <utility>
 
 
 Shape::Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color):
@@ -99,6 +98,7 @@ void Shape::move(sf::Vector2<int> direction){
                 square.move(parsedDirection);
             col_index++;
         }
+        row_index++;
     }
 
     /*std::for_each(squares.begin(), squares.end(), [&](std::vector<sf::RectangleShape>& rows){

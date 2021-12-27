@@ -6,9 +6,10 @@
 //
 
 #include "Window.h"
+#include <iostream>
 
 Window::Window(int width, int height, std::string title)
-:renderWindow(sf::VideoMode(width, height,32),title),
+:renderWindow(sf::VideoMode(width, height),title),
 handler(),
 game(std::make_unique<Game>()),
 currentState(GAME){
@@ -17,6 +18,9 @@ currentState(GAME){
 
 void Window::initialization() {
     renderWindow.setFramerateLimit(60);
+    sf::View view{};
+    view.setCenter({static_cast<float>(renderWindow.getSize().x / 2), static_cast<float>(renderWindow.getSize().y / 2)});
+    renderWindow.setView(view);
 }
 
 void Window::run(){
@@ -36,24 +40,42 @@ void Window::run(){
 }
 
 void Window::handleEvent() {
-    sf::Event event;
+    sf::Event event{};
     while(renderWindow.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             renderWindow.close();
         }
-        if (event.type == sf::Event::KeyReleased){
+        if (event.type == sf::Event::KeyPressed ||
+            event.type == sf::Event::KeyReleased){
             handleInput(event);
         }
     }
 }
 
-void Window::handleInput(sf::Event){
+void Window::handleInput(sf::Event event){
+    auto moveFunc = [&](direction dir){
+        if (event.type == sf::Event::KeyPressed)
+            game->holdMove(dir);
+        else if (event.type == sf::Event::KeyReleased)
+            game->stopMove();
+    };
+
     switch (currentState){
         case GAME:
+            // Do on keyPressed, start clock with high tickrate, stop when keyRelease is called
+            if (event.key.code == 71) // LEFT
+                moveFunc(LEFT);
+            if (event.key.code == 72) // RIGHT
+                moveFunc(RIGHT);
+            if (event.key.code == 73) // UP
+                moveFunc(UP);
+            if (event.key.code == 74) // DOWN
+                moveFunc(DOWN);
             break;
-        case MAIN_MENU  :
+
+        case MAIN_MENU:
             break;
-        case PAUSE      :
+        case PAUSE:
             break;
     }
 }

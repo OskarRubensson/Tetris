@@ -32,11 +32,17 @@ class Grid {
 public:
     Grid(size_t rows, size_t columns);
 
+    // Getters
+    node* get(sf::Vector2<int> position);
+    sf::Vector2<int> get(node& n_ptr);
+    size_t width();
+    size_t height();
+
+    // Utility
     void insert(Shape& shape, sf::Vector2<int> position = {3, 3});
     bool move(sf::Vector2<int> position, sf::Vector2<int> direction);
     bool move(Shape& shape, sf::Vector2<int> direction);
-    node* get(sf::Vector2<int> position);
-    sf::Vector2<int> get(node& n_ptr);
+
 
     template<typename T>
     sf::Vector2<int> indexToVector(T index) const{

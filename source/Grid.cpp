@@ -7,6 +7,7 @@
 
 #include "Grid.h"
 #include <iterator>
+#include <cmath>
 
 Grid::Grid(size_t rows, size_t columns):
 grid(rows * columns),
@@ -17,16 +18,17 @@ DEFAULT_Y(3){
 
 void Grid::insert(Shape& shape, sf::Vector2<int> position) {
     auto& squares = shape.getSquares();
-    int rowID = -1;
-    std::for_each(squares.begin(), squares.end(), [&](auto& row){
-        int colID = -1;
-        std::for_each(row.begin(), row.end(), [&](auto& square){
+    int rowID = 0;
+    std::for_each(squares.begin(), squares.end(), [&](auto& col){
+        int colID = 0;
+        std::for_each(col.begin(), col.end(), [&](auto& square){
             if (square.getSize().x <= 0 || square.getSize().y <= 0){
                 colID++;
                 return;
             }
 
-            sf::Vector2<int> squarePos = {position.x + colID, position.y + rowID};
+            sf::Vector2<int> squarePos = {position.x + colID,
+                                          position.y + rowID};
 
             int insertion_point = vectorToIndex(squarePos);
             if (squarePos.x < 0 || squarePos.x > WIDTH ||
@@ -57,11 +59,10 @@ bool Grid::move(sf::Vector2<int> position, sf::Vector2<int> direction) {
     if (shape_ptr == nullptr)
         return false;
 
-    auto squares = shape_ptr->getBottomSquaresRow();
     auto newPosCenter = position + shape_ptr->getRelativeCenterPosition(*n->object);
 
     // Collision detection
-    // Move each entry in grid associated with this shape to its new position
+    // Create a vector of pairs that indicates "This node should go here"
     std::vector< std::pair<size_t, size_t> > from_to;
     for(int rowIndex = shape_ptr->getSquares().size() - 1; rowIndex >= 0; rowIndex--){
         for(int colIndex = shape_ptr->getSquares().at(rowIndex).size() - 1; colIndex >= 0; colIndex--){
@@ -70,16 +71,21 @@ bool Grid::move(sf::Vector2<int> position, sf::Vector2<int> direction) {
                 continue;
             }
 
-            size_t square_index = vectorToIndex(newPosCenter + sf::Vector2<int>(colIndex - 1, rowIndex - 1));
+            size_t square_index = vectorToIndex(newPosCenter +
+                    sf::Vector2<int>(colIndex - (int)round(shape_ptr->getSquares().size() / 2),
+                                     rowIndex - (int)round(shape_ptr->getSquares().at(rowIndex).size() / 2)));
 
             auto from = grid.at(square_index);
             size_t toIndex = square_index + vectorToIndex(direction);
 
-            if (toIndex >= grid.size())
+                // Keeping shape in the play-area
+            if (toIndex >= grid.size() || // Bottom border
+                (direction.x == 1 && toIndex % WIDTH == 0) || // Right border
+                    (direction.x == -1 && (toIndex + 1) % WIDTH == 0)) // Left border
                 return false;
 
             auto to = grid.at(toIndex);
-            //OK, so thing is - We don't move every node that we should move somehow
+
             if (from.shape == nullptr || (to.shape != nullptr && to.shape != shape_ptr)){
                 return false;
             }
@@ -97,17 +103,8 @@ bool Grid::move(sf::Vector2<int> position, sf::Vector2<int> direction) {
 }
 
 bool Grid::move(Shape& n, sf::Vector2<int> direction) {
-    bool moved = false;
-    /*
-    std::for_each(grid.begin(), grid.end(), [&](node& n_ptr){
-        if (n_ptr.shape == &n && !moved){
-            moved = move(get(n_ptr), direction);
-            return false; //Break iteration
-        }
-        return true; // Continue
-    });*/
-
     auto found_node = std::find_if(grid.begin(), grid.end(), [&](node& n_ptr) { return n_ptr.shape == &n; });
+
     if (found_node == grid.end())
         return false;
     return move(get(*found_node), direction);
@@ -129,4 +126,12 @@ sf::Vector2<int> Grid::get(node& n_ptr) {
 
     size_t index = std::distance(grid.begin(), found_it);
     return indexToVector(index);
+}
+
+size_t Grid::width() {
+    return WIDTH;
+}
+
+size_t Grid::height() {
+    return grid.size() / WIDTH;
 }

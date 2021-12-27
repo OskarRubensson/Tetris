@@ -3,7 +3,7 @@
 
 int main() {
 
-    Window game(500, 500, "Tetris");
+    Window game(20 * SQUARE_SIZE, 30 * SQUARE_SIZE, "Tetris");
     game.run();
     return 0;
 }

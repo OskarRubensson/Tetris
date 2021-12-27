@@ -13,25 +13,47 @@
 #include "shapes/Shape.h"
 #include "Grid.h"
 
+enum direction{
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN
+};
+
 class Game {
 private:
     //Defaults
-    const size_t DEFAULT_ROWS = 40;
-    const size_t DEFAULT_COLUMNS = 40;
+    const size_t DEFAULT_ROWS = 30;
+    const size_t DEFAULT_COLUMNS = 20;
 
-    Clock clock;
+    Clock ticker;
     std::vector<Shape> shape_queue;
     Grid grid;
 
+    Clock moveClock;                    // Hold move clock
+    direction moveDir;                  // Hold move direction
+
+    // Settings
+    const int MOVE_HOLD_SPEED = 100;
+
     bool addNewObj = true;
     int counter = 0;
+    bool lastMoveFailed = false;
 
 public:
     Game();
     Game(size_t rows, size_t columns);
 
-    //Draw
+    // Clock-related
+    void tickDown();
+    void tickMove();
+
+    // Draw
     void draw(sf::RenderWindow& window);
+
+    bool move(direction dir);
+    bool holdMove(direction dir);
+    void stopMove();
 
 };
 

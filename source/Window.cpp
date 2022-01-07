@@ -29,7 +29,10 @@ void Window::run(){
         renderWindow.clear(BG_COLOR);
 
         switch (currentState){
-            case GAME       : game->draw(renderWindow); break;
+            case GAME       :
+                game->update();
+                renderWindow.draw(*game);
+                break;
             case MAIN_MENU:
                 break;
             case PAUSE:
@@ -55,22 +58,25 @@ void Window::handleEvent() {
 void Window::handleInput(sf::Event event){
     auto moveFunc = [&](direction dir){
         if (event.type == sf::Event::KeyPressed)
-            game->holdMove(dir);
+            game->startMove(dir);
         else if (event.type == sf::Event::KeyReleased)
             game->stopMove();
     };
 
     switch (currentState){
         case GAME:
-            // Do on keyPressed, start clock with high tickrate, stop when keyRelease is called
-            if (event.key.code == 71) // LEFT
+            if (event.key.code == sf::Keyboard::Left) // LEFT
                 moveFunc(LEFT);
-            if (event.key.code == 72) // RIGHT
+            if (event.key.code == sf::Keyboard::Right) // RIGHT
                 moveFunc(RIGHT);
-            if (event.key.code == 73) // UP
+            if (event.key.code == sf::Keyboard::Up) // UP
                 moveFunc(UP);
-            if (event.key.code == 74) // DOWN
+            if (event.key.code == sf::Keyboard::Down) // DOWN
                 moveFunc(DOWN);
+            if (event.key.code == sf::Keyboard::Z && event.type == sf::Event::KeyReleased) // Z
+                game->rotate(false);
+            if (event.key.code == sf::Keyboard::X && event.type == sf::Event::KeyReleased) // X
+                game->rotate(true);
             break;
 
         case MAIN_MENU:

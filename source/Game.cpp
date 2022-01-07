@@ -19,81 +19,54 @@
 
 Game::Game():
 ticker(400),
-moveClock(100),
-grid(DEFAULT_ROWS, DEFAULT_COLUMNS){
+moveClock(50),
+grid(DEFAULT_ROWS, DEFAULT_COLUMNS),
+score(){
+    srand(time(nullptr));
     ticker.start();
     moveClock.stop();
 }
 
 Game::Game(size_t rows, size_t columns):
 ticker(400),
-moveClock(100),
-grid(rows, columns){
+moveClock(50),
+grid(rows, columns),
+score(){
+    srand(time(nullptr));
     ticker.start();
     moveClock.stop();
 }
 
-void Game::tickDown() {
-    // If clock-rate has passed, try moving shape down
-    if (ticker.hasTicked()){
-        if (addNewObj){
-            shape_queue.push_back(Shape_I());
-            grid.insert(shape_queue.back(), {3, 0});
-            addNewObj = false;
-            lastMoveFailed = false;
-        }
-
-        auto& s = shape_queue.back();
-
-        if (lastMoveFailed)
-            addNewObj = true;
-        else if (!grid.move(s, {0, 1}))
-            lastMoveFailed = true;
-        else
-            lastMoveFailed = false;
-
-        counter++;
-    }
-}
-
-void Game::tickMove() {
-    if (moveClock.hasTicked()){
-        move(moveDir);
-    }
-}
-
-
-void Game::draw(sf::RenderWindow& window){
-    tickMove();
-    tickDown();
-
-        // Draw border
-    sf::RectangleShape border({SQUARE_SIZE * grid.width(), SQUARE_SIZE * grid.height()});
+void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    // Draw border
+    sf::RectangleShape border({SQUARE_SIZE * (float)grid.width(), SQUARE_SIZE * ((float)grid.height() - 1)});
     border.setFillColor(sf::Color::Black);
     border.setOutlineColor(sf::Color::White);
     border.setOutlineThickness(SQUARE_SIZE);
-    window.draw(border);
+    border.setPosition(0, SQUARE_SIZE);
+    target.draw(border);
 
-        // Draw all shapes
-    for(auto& s: shape_queue){
-        s.draw(window);
+    // Draw all shapes
+    for(auto& s: shapes){
+        target.draw(s);
     }
 }
 
+void Game::update(){
+    tickMove();
+    tickDown();
+}
+
 bool Game::move(direction dir) {
-    auto& s = shape_queue.back();
+    auto& s = shapes.back();
 
     switch (dir){
         case LEFT:
             grid.move(s, {-1, 0});
-            lastMoveFailed = false;
-            addNewObj = false;
             break;
 
         case RIGHT:
             grid.move(s, {1, 0});
-            lastMoveFailed = false;
-            addNewObj = false;
             break;
 
         case DOWN:
@@ -101,17 +74,58 @@ bool Game::move(direction dir) {
             break;
 
         case UP:
+            while(grid.move(s, {0, 1}));
             break;
     }
 
     return true;
 }
 
-bool Game::holdMove(direction dir) {
+void Game::tickDown() {
+    // If clock-rate has passed, try moving shape down
+    if (ticker.hasTicked()){
+        if (addNewObj){
+            size_t rowsCleared = grid.clearFullRows();
+            if (rowsCleared > 0)
+                score.add(rowsCleared);
+
+            if (!grid.isRowEmpty(0)) {
+                // GAME OVER
+            }
+            addRandomShape();
+            addNewObj = false;
+        }
+
+        auto& s = shapes.back();
+        if (!grid.move(s, {0, 1}))
+            addNewObj = true;
+    }
+}
+
+void Game::tickMove() {
+    if (moveClock.hasTicked()){
+        move(moveDir);
+        addNewObj = false;
+    }
+}
+
+void Game::startMove(direction dir) {
     moveDir = dir;
     moveClock.start();
 }
 
 void Game::stopMove(){
     moveClock.stop();
+}
+
+void Game::addRandomShape(){
+    Shape available[7] {Shape_I(), Shape_J(), Shape_L(), Shape_S(), Shape_SQR(), Shape_T(), Shape_Z()};
+    shapes.push_back(available[ rand() % 7 ]);
+    grid.insert(shapes.back(), {static_cast<int>(grid.width() / 2), 0});
+}
+
+void Game::rotate(bool clockwise) {
+    auto& s = shapes.back();
+    grid.rotate(s, clockwise);
+    addNewObj = false;
 }

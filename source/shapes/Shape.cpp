@@ -13,17 +13,10 @@
 Shape::Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color):
 squares(std::move(squares)),
 color(color){
-    initProperties();
+    resetProperties();
 }
 
-
-Shape::Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color, sf::Vector2<float> position):
-squares(std::move(squares)),
-color(color){
-    initProperties();
-}
-
-void Shape::initProperties() {
+void Shape::resetProperties() {
     int row_index = 0;
     std::for_each(squares.begin(), squares.end(), [&](std::vector<sf::RectangleShape>& rows){
         int col_index = 0;
@@ -43,24 +36,11 @@ std::vector<std::vector<sf::RectangleShape> >& Shape::getSquares() {
     return squares;
 }
 
-std::vector<int> Shape::getBottomSquaresRow() {
-    std::vector<int> bottom(3, -1);
-
-    for(int rowNo = 0; rowNo < squares.size(); rowNo++){
-        for(int colNo = 0; colNo < squares.at(rowNo).size(); colNo++){
-            auto rectangle = squares.at(rowNo).at(colNo);
-            if(rectangle.getSize().x > 0 && rectangle.getSize().y > 0)
-                bottom.at(colNo) = rowNo;
-        }
-    }
-    return bottom;
-}
-
-sf::Vector2<int> Shape::getRelativeCenterPosition(const sf::RectangleShape& square) {
+sf::Vector2<int> Shape::getRelativeCenterPosition(const sf::RectangleShape* square) {
     for(int rowNo = 0; rowNo < squares.size(); rowNo++){
         for(int colNo = 0; colNo < squares.at(rowNo).size(); colNo++){
             auto& rect = squares.at(rowNo).at(colNo);
-            if (&rect == &square){
+            if (&rect == square){
                 sf::Vector2<int> center = {static_cast<int>(round(squares.size() / 2)),
                                               static_cast<int>(round(squares.at(rowNo).size() / 2))};
                 center -= sf::Vector2<int>(colNo, rowNo);
@@ -71,18 +51,12 @@ sf::Vector2<int> Shape::getRelativeCenterPosition(const sf::RectangleShape& squa
     return {0, 0};
 }
 
-void Shape::draw(sf::RenderWindow &window) {
-    int row_index = 0;
-    sf::Color c = color;
-
-    std::for_each(squares.begin(), squares.end(), [&](std::vector<sf::RectangleShape>& rows){
-        int col_index = 0;
-        std::for_each(rows.begin(), rows.end(), [&](sf::RectangleShape& square){
+void Shape::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    std::for_each(squares.begin(), squares.end(), [&target](const std::vector<sf::RectangleShape>& rows){
+        std::for_each(rows.begin(), rows.end(), [&target](const sf::RectangleShape& square){
             if (square.getSize().x > 0 || square.getSize().y > 0)
-                window.draw(square);
-            col_index++;
+                target.draw(square);
         });
-        row_index++;
     });
 }
 
@@ -100,14 +74,21 @@ void Shape::move(sf::Vector2<int> direction){
         }
         row_index++;
     }
+}
 
-    /*std::for_each(squares.begin(), squares.end(), [&](std::vector<sf::RectangleShape>& rows){
-        int col_index = 0;
-        std::for_each(rows.begin(), rows.end(), [&](sf::RectangleShape& square){
-            if (square.getSize().x > 0 || square.getSize().y > 0)
-                square.move(parsedDirection);
-            col_index++;
-        });
-        row_index++;
-    });*/
+void Shape::rotate(bool clockwise) {
+    std::vector<std::vector<sf::RectangleShape> > rotated_squares{
+        squares[0].size(),
+        std::vector<sf::RectangleShape>{squares.size()}
+    };
+
+    for(int x = 0; x < squares.size(); x++){
+        for(int y = 0; y < squares[x].size(); y++) {
+            if (clockwise)
+                rotated_squares[y][-x -1 + squares[x].size()] = std::move(squares[x][y]);
+            else
+                rotated_squares[-y -1 + squares.size()][x] = std::move(squares[x][y]);
+        }
+    }
+    squares = std::move(rotated_squares);
 }

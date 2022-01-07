@@ -12,6 +12,7 @@
 #include "Clock.h"
 #include "shapes/Shape.h"
 #include "Grid.h"
+#include "Score.h"
 
 enum direction{
     LEFT,
@@ -20,40 +21,45 @@ enum direction{
     DOWN
 };
 
-class Game {
+class Game: public sf::Drawable {
 private:
     //Defaults
     const size_t DEFAULT_ROWS = 30;
     const size_t DEFAULT_COLUMNS = 20;
 
-    Clock ticker;
-    std::vector<Shape> shape_queue;
     Grid grid;
+    Clock ticker;
+    std::vector<Shape> shapes;
+    Score score;
 
     Clock moveClock;                    // Hold move clock
-    direction moveDir;                  // Hold move direction
+    direction moveDir = DOWN;           // Hold move direction
 
     // Settings
-    const int MOVE_HOLD_SPEED = 100;
+    const int MOVE_HOLD_SPEED = 80;
 
     bool addNewObj = true;
-    int counter = 0;
-    bool lastMoveFailed = false;
-
-public:
-    Game();
-    Game(size_t rows, size_t columns);
+    void addRandomShape();
 
     // Clock-related
     void tickDown();
     void tickMove();
 
-    // Draw
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
+public:
+    Game();
+    Game(size_t rows, size_t columns);
+
+    // Draw
+    void update();
+
+    // User move
     bool move(direction dir);
-    bool holdMove(direction dir);
+    void startMove(direction dir);
     void stopMove();
+
+    void rotate(bool clockwise);
 
 };
 

@@ -13,24 +13,23 @@
 
 const float SQUARE_SIZE = 25;
 
-class Shape {
+class Shape: public sf::Drawable{
     sf::Color color;
     std::vector<std::vector<sf::RectangleShape> > squares;
 
-    void initProperties();
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 public:
     Shape() = delete;
     Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color);
-    Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color, sf::Vector2<float> position);
+
+    void resetProperties();
 
     //Getters
     std::vector<std::vector<sf::RectangleShape> >& getSquares();
-    std::vector<int> getBottomSquaresRow();
-    sf::Vector2<int> getRelativeCenterPosition(const sf::RectangleShape& square);
+    sf::Vector2<int> getRelativeCenterPosition(const sf::RectangleShape* square);
 
-
-    virtual void draw(sf::RenderWindow& window);
     virtual void move(sf::Vector2<int> direction);
+    virtual void rotate(bool clockwise);
 };
 
 

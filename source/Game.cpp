@@ -19,22 +19,28 @@
 
 Game::Game():
 ticker(400),
-moveClock(50),
+moveClock(70),
+bottomClock(1000),
 grid(DEFAULT_ROWS, DEFAULT_COLUMNS),
 score(){
-    srand(time(nullptr));
-    ticker.start();
-    moveClock.stop();
+    start();
 }
 
 Game::Game(size_t rows, size_t columns):
 ticker(400),
-moveClock(50),
+moveClock(70),
+bottomClock(1000),
 grid(rows, columns),
 score(){
+    start();
+}
+
+void Game::start(){
     srand(time(nullptr));
     ticker.start();
     moveClock.stop();
+    score.setPosition({0, -SQUARE_SIZE - 10});
+    level = 0;
 }
 
 void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const {
@@ -50,6 +56,9 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     for(auto& s: shapes){
         target.draw(s);
     }
+
+    // Draw score
+    target.draw(score);
 }
 
 void Game::update(){
@@ -84,21 +93,34 @@ bool Game::move(direction dir) {
 void Game::tickDown() {
     // If clock-rate has passed, try moving shape down
     if (ticker.hasTicked()){
-        if (addNewObj){
+        if (addNewObj && (bottomClock.hasTicked() || !bottomClock.isRunning()) ){
             size_t rowsCleared = grid.clearFullRows();
             if (rowsCleared > 0)
                 score.add(rowsCleared);
+
+            // Tick levelTicker for each new shape inserted
+            // Level is increased each 10th tick
+            levelTicker += 1;
+            if (levelTicker % 10 == 0){
+                level += 1;
+                ticker.setClockrate(ticker.getClockrate() / 2);
+                score.setLevel(score.getLevel() + 1);
+            }
 
             if (!grid.isRowEmpty(0)) {
                 // GAME OVER
             }
             addRandomShape();
             addNewObj = false;
+            bottomClock.stop();
         }
 
         auto& s = shapes.back();
-        if (!grid.move(s, {0, 1}))
+        if (!grid.move(s, {0, 1})){
             addNewObj = true;
+            if (!bottomClock.isRunning())
+                bottomClock.start(true);
+        }
     }
 }
 

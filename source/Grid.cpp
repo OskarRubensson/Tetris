@@ -218,8 +218,8 @@ size_t Grid::clearFullRows(){
         // Clear each row that was full
         clear(grid.begin() + rows.back(), grid.begin() + rows.front() + width());
 
-        // Move each object in the grid downwards for the amount of rows that was cleared
-        std::for_each(grid.begin(), grid.end(), [&](node& n){
+        // Move each object above the cleared rows downwards for the amount of rows that was cleared
+        std::for_each(grid.begin(), grid.begin() + rows.front() + width(), [&](node& n){
             if (n.object != nullptr){
                 n.object->move({0, rows.size() * SQUARE_SIZE});
             }

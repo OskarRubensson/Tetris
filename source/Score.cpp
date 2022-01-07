@@ -7,6 +7,20 @@
 
 #include "Score.h"
 
+void Score::initText(){
+    if (font.loadFromFile("../resources/fonts/Pacifico.ttf")){
+        text.setFont(font);
+        text.setString("Score: 0");
+        text.setCharacterSize(24);
+        text.setFillColor(sf::Color::White);
+    }
+}
+
+void Score::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    states.transform *= getTransform();
+    target.draw(text, states);
+}
+
 void Score::setLevel(size_t level) {
     this->level = level;
 }
@@ -30,4 +44,6 @@ void Score::add(size_t points) {
             _points += 50 * (level + 1);
             break;
     }
+
+    text.setString("Score: " + std::to_string(_points));
 }

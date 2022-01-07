@@ -25,18 +25,21 @@ class Game: public sf::Drawable {
 private:
     //Defaults
     const size_t DEFAULT_ROWS = 30;
-    const size_t DEFAULT_COLUMNS = 20;
+    const size_t DEFAULT_COLUMNS = 15;
 
     Grid grid;
     Clock ticker;
     std::vector<Shape> shapes;
     Score score;
 
-    Clock moveClock;                    // Hold move clock
-    direction moveDir = DOWN;           // Hold move direction
+    // Level related
+    size_t levelTicker;
+    size_t level;
 
-    // Settings
-    const int MOVE_HOLD_SPEED = 80;
+    Clock bottomClock;                  // Time at bottom
+    Clock moveClock;                    // Hold move clock
+    direction moveDir;                  // Hold move direction
+
 
     bool addNewObj = true;
     void addRandomShape();
@@ -45,11 +48,16 @@ private:
     void tickDown();
     void tickMove();
 
+    void start();
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
 public:
     Game();
     Game(size_t rows, size_t columns);
+
+    // Getters
+    float width()  { return static_cast<float>(grid.width()) * SQUARE_SIZE; }
+    float height() { return static_cast<float>(grid.height()) * SQUARE_SIZE; }
 
     // Draw
     void update();

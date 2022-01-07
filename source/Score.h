@@ -10,17 +10,28 @@
 
 
 #include <cstddef>
+#include <SFML/Graphics.hpp>
 
-class Score {
-    size_t _points = 0;
-    size_t level = 1;
+class Score: public sf::Transformable, public sf::Drawable {
+    size_t _points;
+    size_t level;
+    sf::Text text;
+    sf::Font font;
 
+    void initText();
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 public:
+    explicit Score()
+        :_points(), level(), text(), font(){
+        initText();
+    }
 
-    Score() = default;
     explicit Score(size_t startPoints)
-        : _points(startPoints)
-    {}
+            : _points(startPoints), level(), text(), font(){
+        initText();
+    }
+
+    size_t getLevel() const{ return level; }
 
     // Setters
     void setLevel(size_t level);

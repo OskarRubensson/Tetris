@@ -14,17 +14,20 @@
 
 class Clock {
     const int DEFAULT_CLOCKRATE = 1000;
-    int clockrate;
+    size_t clockrate;
     bool running;
     std::chrono::time_point<std::chrono::steady_clock> last_clock;
 
 public:
     Clock();
-    Clock(int clockrate);
+    Clock(size_t clockrate);
 
     bool hasTicked();
     void stop();
-    void start();
+    void start(bool reset = false);
+    bool isRunning() { return running; }
+    size_t getClockrate();
+    void setClockrate(int newClockrate);
 
 };
 

@@ -19,7 +19,8 @@ currentState(GAME){
 void Window::initialization() {
     renderWindow.setFramerateLimit(60);
     sf::View view{};
-    view.setCenter({static_cast<float>(renderWindow.getSize().x / 2), static_cast<float>(renderWindow.getSize().y / 2)});
+    view.setSize(game->height() + 100, game->height() + 100);
+    view.setCenter({static_cast<float>(renderWindow.getSize().x - 100) / 2, static_cast<float>(renderWindow.getSize().y) / 2});
     renderWindow.setView(view);
 }
 

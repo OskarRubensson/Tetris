@@ -12,15 +12,15 @@
 Clock::Clock():
     last_clock(std::chrono::high_resolution_clock::now()),
     clockrate(DEFAULT_CLOCKRATE),
-    running(true){
+    running(false){
 }
 
 
-Clock::Clock(int clockrate):
+Clock::Clock(size_t clockrate):
     last_clock(std::chrono::high_resolution_clock::now()),
     DEFAULT_CLOCKRATE(clockrate),
     clockrate(clockrate),
-    running(true){
+    running(false){
 }
 
 bool Clock::hasTicked(){
@@ -41,6 +41,17 @@ void Clock::stop() {
     running = false;
 }
 
-void Clock::start() {
+void Clock::start(bool reset) {
+    if (reset)
+        last_clock = std::chrono::high_resolution_clock::now();
     running = true;
+}
+
+size_t Clock::getClockrate() {
+    return clockrate;
+}
+
+void Clock::setClockrate(int newClockrate) {
+    if (newClockrate >= 20)
+        clockrate = newClockrate;
 }

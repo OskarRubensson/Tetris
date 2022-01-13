@@ -9,43 +9,61 @@
 #include <iterator>
 #include <cmath>
 
+/**
+ * Parametrized constructor. Creates a tetris-grid with a given rows- and columns-count.
+ * @param rows The amount of rows in the grid.
+ * @param columns The amount of columns in the grid.
+ */
 Grid::Grid(size_t rows, size_t columns):
 grid(rows * columns),
 WIDTH(columns){
 }
 
-
+/**
+ * Removes a given shape from the grid, i.e. clears all nodes that includes the shape.
+ * @param shape A reference to the shape that should be removed.
+ */
 void Grid::remove(Shape& shape){
+    // Find a node with this shape
     node& n = *std::find_if(grid.begin(), grid.end(), [&](node& n_ptr) { return n_ptr.shape == &shape; });
-
     auto nPos = get(n);
-
     if (nPos.x == -1)
         return;
 
+    // Information about the shape and it's position
     size_t width = shape.getSquares().size();
     size_t height = shape.getSquares().at(0).size();
+    // The top-left objects position in the grid.
     auto topLeft = shape.getRelativeCenterPosition(n.object) - sf::Vector2<int>(width / 2, height /  2);
     auto maxIndex = width * height;
 
     // Put nullptr to the shapes previous nodes
-    // A rotation should never fail, therefore we can safely remove it from its previous position
+    // With this we only look at the nodes where the shape could possibly be instead of looking at the entire grid.
     for(size_t index = 0; index < maxIndex; index++){
         auto currPos = topLeft + indexToVector(index, width);
         node* currPosNode = get(nPos + currPos);
 
+        // To prevent removal of any other shape.
         if (currPosNode == nullptr || currPosNode->shape == nullptr || currPosNode->shape != &shape)
             continue;
 
+        // Clear shape.
         currPosNode->shape = nullptr;
         currPosNode->object = nullptr;
     }
 }
 
+/**
+ * Try inserting a shape at given position in the grid.
+ * @param shape The shape to be inserted.
+ * @param position The top-left position of the insertion
+ * @return Boolean based on if the insertion was successful or not.
+ */
 bool Grid::insert(Shape& shape, sf::Vector2<int> position) {
     auto& squares = shape.getSquares();
     std::vector<std::pair<size_t, sf::RectangleShape*> > insertion_points;
 
+    // Iterate each square that the shape includes
     for (int rowID = 0; rowID < squares.size(); rowID++){
         for (int colID = 0; colID < squares.at(rowID).size(); colID++){
             auto& square = squares.at(rowID).at(colID);
@@ -55,9 +73,9 @@ bool Grid::insert(Shape& shape, sf::Vector2<int> position) {
                 continue;
             }
 
+            // Position for this square
             sf::Vector2<int> squarePos = {position.x + colID,
                                           position.y + rowID};
-
             int insertion_point = vectorToIndex(squarePos);
 
             // Check bounds
@@ -73,17 +91,31 @@ bool Grid::insert(Shape& shape, sf::Vector2<int> position) {
             insertion_points.emplace_back(insertion_point, &square);
         }
     }
+    // All checks succeeded and the insertion can be made
     for (auto pair: insertion_points){
         grid.at(pair.first).object = pair.second;
         grid.at(pair.first).shape = &shape;
     }
 
+    // For setting the visual position on the screen of the shape.
     shape.move(position);
     return true;
 }
 
-bool Grid::move(node* n, sf::Vector2<int> direction) {
+/**
+ * Try moving a shape in a set direction.
+ * @param s The shape to move.
+ * @param direction sf::Vector2 containing the x and y that the shape should be moved with-
+ * @return Boolean based on if the move was successful or not.
+ */
+bool Grid::move(Shape& s, sf::Vector2<int> direction) {
+    auto n = std::find_if(grid.begin(), grid.end(), [&](node& n_ptr) { return n_ptr.shape == &s; });
+
+    if (n == grid.end())
+        return false;
+
     auto position = get(*n);
+
     // Error checking
     if (position.x < 0 || position.y < 0)
         return false;
@@ -106,16 +138,16 @@ bool Grid::move(node* n, sf::Vector2<int> direction) {
             }
 
             size_t square_index = vectorToIndex(newPosCenter +
-                    sf::Vector2<int>(colIndex - (int)round(shape_ptr->getSquares().size() / 2),
-                                     rowIndex - (int)round(shape_ptr->getSquares().at(rowIndex).size() / 2)));
+                                                sf::Vector2<int>(colIndex - (int)round(shape_ptr->getSquares().size() / 2),
+                                                                 rowIndex - (int)round(shape_ptr->getSquares().at(rowIndex).size() / 2)));
 
             auto from = grid.at(square_index);
             size_t toIndex = square_index + vectorToIndex(direction);
 
-                // Keeping shape in the play-area
+            // Keeping shape in the play-area
             if (toIndex >= grid.size() || // Bottom border
                 (direction.x == 1 && toIndex % WIDTH == 0) || // Right border
-                    (direction.x == -1 && (toIndex + 1) % WIDTH == 0)) // Left border
+                (direction.x == -1 && (toIndex + 1) % WIDTH == 0)) // Left border
                 return false;
 
             auto to = grid.at(toIndex);
@@ -130,7 +162,7 @@ bool Grid::move(node* n, sf::Vector2<int> direction) {
     shape_ptr->move(direction);
 
     // Under normal iteration we start swapping at bottom-right and work row-by-row right-to-left
-    // If x == -1 we need to go left-to-right
+    // If x == -1 we need to go left-to-right since we are doing a std::swap.
     if (direction.x == -1)
         swapShapes(from_to.rbegin(), from_to.rend());
     else
@@ -139,14 +171,12 @@ bool Grid::move(node* n, sf::Vector2<int> direction) {
     return true;
 }
 
-bool Grid::move(Shape& n, sf::Vector2<int> direction) {
-    auto found_node = std::find_if(grid.begin(), grid.end(), [&](node& n_ptr) { return n_ptr.shape == &n; });
-
-    if (found_node == grid.end())
-        return false;
-    return move(&*found_node, direction);
-}
-
+/**
+ * Try rotating a shape 90-degrees clockwise or counter-clockwise.
+ * @param shape Shape to be rotated
+ * @param clockwise Rotates clockwise if true, otherwise counter-clockwise.
+ * @return Boolean based of if the rotation was successful.
+ */
 bool Grid::rotate(Shape &shape, bool clockwise) {
     node& n = *std::find_if(grid.begin(), grid.end(), [&](node& n_ptr) { return n_ptr.shape == &shape; });
     auto nPos = get(n);
@@ -179,6 +209,11 @@ bool Grid::rotate(Shape &shape, bool clockwise) {
     return true;
 }
 
+/**
+ * For a given row-index. Check if it contains no shapes.
+ * @param row Index of the row to check
+ * @return Boolean based on if the row was empty or not.
+ */
 bool Grid::isRowEmpty(size_t row){
     int col = 0;
     while(col < width()){
@@ -189,6 +224,11 @@ bool Grid::isRowEmpty(size_t row){
     return true;
 }
 
+/**
+ * For a given row-index. Check if each node contains a shape.
+ * @param row Index of the row to check.
+ * @return Boolean based on if the row was full or not.
+ */
 bool Grid::isRowFull(size_t row){
     int col = 0;
     while(col < width()){
@@ -204,6 +244,10 @@ bool Grid::isRowFull(size_t row){
     return false;
 }
 
+/**
+ * Checks each row in the grid. If it is full each node is cleared. Also, all nodes above this row is bumped down.
+ * @return The amount of rows that was cleared.
+ */
 size_t Grid::clearFullRows(){
     std::vector<size_t> rows;
 
@@ -229,6 +273,11 @@ size_t Grid::clearFullRows(){
     return rows.size();
 }
 
+/**
+ * For a given position, return the node-object.
+ * @param position The position of the node to get.
+ * @return Returns node at the position. Nullptr if position is invalid.
+ */
 node* Grid::get(sf::Vector2<int> position) {
     size_t index = vectorToIndex(position);
     if (grid.size() <= index)
@@ -236,6 +285,11 @@ node* Grid::get(sf::Vector2<int> position) {
     return &grid.at(index);
 }
 
+/**
+ * Getter for finding a given nodes position in the grid.
+ * @param n_ptr Pointer to the node to find.
+ * @return Position of the node. {-1, -1} if it wasn't found.
+ */
 sf::Vector2<int> Grid::get(node& n_ptr) {
     auto found_it = std::find_if(grid.begin(), grid.end(), [&](node& n){ return &n_ptr == &n; });
 
@@ -247,18 +301,34 @@ sf::Vector2<int> Grid::get(node& n_ptr) {
     return indexToVector(index);
 }
 
+/**
+ * Getter for the width of the grid.
+ * @return the grid's width.
+ */
 size_t Grid::width() {
     return WIDTH;
 }
 
+/**
+ * Getter for the height of the grid.
+ * @return the grid's height.
+ */
 size_t Grid::height() {
     return grid.size() / WIDTH;
 }
 
+/**
+ * Getter for the width of the grid.
+ * @return the grid's width.
+ */
 size_t Grid::width() const {
     return WIDTH;
 }
 
+/**
+ * Getter for the height of the grid.
+ * @return the grid's height.
+ */
 size_t Grid::height() const{
     return grid.size() / WIDTH;
 }

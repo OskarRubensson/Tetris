@@ -9,20 +9,20 @@
 #include <iostream>
 #include <chrono>
 
-Clock::Clock():
-    last_clock(std::chrono::high_resolution_clock::now()),
-    clockrate(DEFAULT_CLOCKRATE),
-    running(false){
-}
-
-
+/**
+ * Parametrized constructor. Creates a clock with a given clockrate
+ * @param clockrate The clockrate to set the clock to.
+ */
 Clock::Clock(size_t clockrate):
     last_clock(std::chrono::high_resolution_clock::now()),
-    DEFAULT_CLOCKRATE(clockrate),
     clockrate(clockrate),
     running(false){
 }
 
+/**
+ * Check-function to see if a clockrate-time has passed.
+ * @return True if clock is running and a clockrate has passed since this was last run.
+ */
 bool Clock::hasTicked(){
     if (!running)
         return false;
@@ -37,20 +37,35 @@ bool Clock::hasTicked(){
     return false;
 }
 
+/**
+ * Stops the clock.
+ */
 void Clock::stop() {
     running = false;
 }
 
+/**
+ * Starts the clock.
+ * @param reset if true then clock restarts. Otherwise, it resumes. Defaults to false
+ */
 void Clock::start(bool reset) {
     if (reset)
         last_clock = std::chrono::high_resolution_clock::now();
     running = true;
 }
 
-size_t Clock::getClockrate() {
+/**
+ * Getter for clockrate.
+ * @return clockrate.
+ */
+size_t Clock::getClockrate() const {
     return clockrate;
 }
 
+/**
+ * Setter for clockrate.
+ * @param newClockrate The new clockrate to be used.
+ */
 void Clock::setClockrate(int newClockrate) {
     if (newClockrate >= 20)
         clockrate = newClockrate;

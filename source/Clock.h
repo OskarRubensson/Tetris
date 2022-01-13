@@ -12,21 +12,33 @@
 #include <ctime>
 #include <chrono>
 
+/**
+ * A clock that can be used when something should be done in an interval.
+ */
 class Clock {
-    const int DEFAULT_CLOCKRATE = 1000;
     size_t clockrate;
     bool running;
     std::chrono::time_point<std::chrono::steady_clock> last_clock;
 
 public:
-    Clock();
-    Clock(size_t clockrate);
+    const static int DEFAULT_CLOCKRATE = 1000;
+
+    /**
+     * Default constructor - Uses parametrized constructor with Clock::DEFAULT_CLOCKRATE.
+     */
+    Clock(): Clock(DEFAULT_CLOCKRATE) {}
+    explicit Clock(size_t clockrate);
 
     bool hasTicked();
     void stop();
     void start(bool reset = false);
-    bool isRunning() { return running; }
-    size_t getClockrate();
+
+    /**
+     * Check-function to see if clock is running or not.
+     * @return bool based on if clock is running.
+     */
+    [[nodiscard]] bool isRunning() const { return running; }
+    [[nodiscard]] size_t getClockrate() const;
     void setClockrate(int newClockrate);
 
 };

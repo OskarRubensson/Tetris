@@ -10,26 +10,32 @@
 
 
 #include <SFML/Graphics.hpp>
-#include "InputHandler.h"
 #include "Game.h"
+#include "Menu.h"
 
 
-enum State {MAIN_MENU, PAUSE, GAME};
+enum State {MAIN_MENU, GAME};
 
+/**
+ * The window that everything is displayed within. Manages the interaction between user and game
+ */
 class Window {
 private:
     sf::RenderWindow renderWindow;
-    InputHandler handler;
     std::unique_ptr<Game> game;
+    std::unique_ptr<Menu> mainMenu;
     const sf::Color BG_COLOR = sf::Color::Black;
     State currentState = MAIN_MENU;
 
     void handleEvent();
-    void handleInput(sf::Event);
+    void handleInput(sf::Event& event);
+    void handleMainMenuInput(sf::Event& event);
+    void handleGameInput(sf::Event& event);
 public:
-    Window(int width, int height, std::string title);
+    Window(int width, int height, const std::string& title);
     void initialization();
     void run();
+
 
     //Getters
     State getState() const;

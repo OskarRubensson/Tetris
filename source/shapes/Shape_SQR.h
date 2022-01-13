@@ -1,7 +1,7 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Shape_SQR.h, 2021-12-18 - 2021-12-18
+// Shape_SQR.h, 2021-12-18 - 2022-01-13
 // kortfattat vad filen innehåller
 //
 
@@ -11,12 +11,9 @@
 
 #include "Shape.h"
 
-const std::vector<std::vector<sf::RectangleShape> > SQR = {
-    {sf::RectangleShape({0, 0}), sf::RectangleShape({0, 0}), sf::RectangleShape({0, 0})},
-    {sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE}), sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE}), sf::RectangleShape({0, 0})},
-    {sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE}), sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE}), sf::RectangleShape({0, 0})}
-};
-
+/**
+ * Class that inherits from the Shape-class to create a tetris Square-shape.
+ */
 class Shape_SQR: public Shape {
 public:
     Shape_SQR();

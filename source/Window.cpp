@@ -8,47 +8,73 @@
 #include "Window.h"
 #include <iostream>
 
-Window::Window(int width, int height, std::string title)
+/**
+ * Parametrized constructor. Creates a window with a given width, height & title.
+ * Also initializes all the game components, such as game, main menu etc.
+ * @param width Width of the window to create.
+ * @param height Height of the window to create.
+ * @param title Title of the window to create.
+ */
+Window::Window(int width, int height, const std::string& title)
 :renderWindow(sf::VideoMode(width, height),title),
-handler(),
 game(std::make_unique<Game>()),
-currentState(GAME){
+mainMenu(std::make_unique<Menu>(std::vector<std::string>{"Start", "Quit"})),
+currentState(MAIN_MENU){
     initialization();
 }
 
+/**
+ * Initializes the position and size of each screen (game, main menu...)
+ */
 void Window::initialization() {
     renderWindow.setFramerateLimit(60);
-    sf::View view{};
-    view.setSize(game->height() + 100, game->height() + 100);
-    view.setCenter({static_cast<float>(renderWindow.getSize().x - 100) / 2, static_cast<float>(renderWindow.getSize().y) / 2});
-    renderWindow.setView(view);
+    mainMenu->setPosition(100, 100);
+    game->setScale({1.4f, 1.6f});
+    game->setPosition({
+        (float)renderWindow.getSize().x / 2 - (game->width() / 2),
+        (float)renderWindow.getSize().y / 2 - (game->height() / 2)});
 }
 
+/**
+ * Runs the window, and will keep it running until window is closed.
+ */
 void Window::run(){
     while(renderWindow.isOpen()){
         handleEvent();
         renderWindow.clear(BG_COLOR);
 
+        // Draw correct object based on currentState
         switch (currentState){
-            case GAME       :
+            case GAME :
+                // If game is in game-over state, reset it.
+                if (game->getState() == Game::GAME_OVER) {
+                    game.reset();
+                    game = std::make_unique<Game>();
+                    initialization();
+                    currentState = MAIN_MENU;
+                    break;
+                }
                 game->update();
                 renderWindow.draw(*game);
                 break;
             case MAIN_MENU:
-                break;
-            case PAUSE:
+                renderWindow.draw(*mainMenu);
                 break;
         }
         renderWindow.display();
     }
 }
 
+/**
+ * Handle any event that is lying in the event-queue
+ */
 void Window::handleEvent() {
     sf::Event event{};
     while(renderWindow.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             renderWindow.close();
         }
+        // On user input -> handleInput
         if (event.type == sf::Event::KeyPressed ||
             event.type == sf::Event::KeyReleased){
             handleInput(event);
@@ -56,41 +82,92 @@ void Window::handleEvent() {
     }
 }
 
-void Window::handleInput(sf::Event event){
-    auto moveFunc = [&](direction dir){
-        if (event.type == sf::Event::KeyPressed)
-            game->startMove(dir);
-        else if (event.type == sf::Event::KeyReleased)
-            game->stopMove();
-    };
-
+/**
+ * Handles any user input. Redirects it to the game if its running, or menu it that is running.
+ * @param event Event to handle
+ */
+void Window::handleInput(sf::Event& event){
     switch (currentState){
         case GAME:
-            if (event.key.code == sf::Keyboard::Left) // LEFT
-                moveFunc(LEFT);
-            if (event.key.code == sf::Keyboard::Right) // RIGHT
-                moveFunc(RIGHT);
-            if (event.key.code == sf::Keyboard::Up) // UP
-                moveFunc(UP);
-            if (event.key.code == sf::Keyboard::Down) // DOWN
-                moveFunc(DOWN);
-            if (event.key.code == sf::Keyboard::Z && event.type == sf::Event::KeyReleased) // Z
-                game->rotate(false);
-            if (event.key.code == sf::Keyboard::X && event.type == sf::Event::KeyReleased) // X
-                game->rotate(true);
+            handleGameInput(event);
+            break;
+        case MAIN_MENU:
+            handleMainMenuInput(event);
             break;
 
-        case MAIN_MENU:
-            break;
-        case PAUSE:
-            break;
     }
 }
 
+/**
+ * Handle each input that the game can handle.
+ * @param event Event containing the input that was given
+ */
+void Window::handleGameInput(sf::Event& event) {
+    // GAME RUNNING INPUT
+    if (game->getState() == Game::RUNNING){
+        auto moveFunc = [&](size_t dir){
+            if (event.type == sf::Event::KeyPressed)
+                game->startMove(dir);
+            else if (event.type == sf::Event::KeyReleased)
+                game->stopMove();
+        };
+
+        if (event.key.code == sf::Keyboard::Left) // LEFT
+            moveFunc(Game::LEFT);
+        if (event.key.code == sf::Keyboard::Right) // RIGHT
+            moveFunc(Game::RIGHT);
+        if (event.key.code == sf::Keyboard::Up) // UP
+            moveFunc(Game::UP);
+        if (event.key.code == sf::Keyboard::Down) // DOWN
+            moveFunc(Game::DOWN);
+        if (event.key.code == sf::Keyboard::Z && event.type == sf::Event::KeyReleased) // Z
+            game->rotate(false);
+        if (event.key.code == sf::Keyboard::X && event.type == sf::Event::KeyReleased) // X
+            game->rotate(true);
+        if (event.key.code == sf::Keyboard::Escape && event.type == sf::Event::KeyReleased) // X
+            game->pause();
+
+        // PAUSED INPUT
+    } else if (game->getState() == Game::PAUSED && event.type == sf::Event::KeyReleased){
+        if (event.key.code == sf::Keyboard::Up) // UP
+            game->menuInput(Game::UP);
+        if (event.key.code == sf::Keyboard::Down) // DOWN
+            game->menuInput(Game::DOWN);
+        if (event.key.code == sf::Keyboard::Enter) // ENTER
+            game->menuInput(Game::ENTER);
+    }
+}
+
+void Window::handleMainMenuInput(sf::Event& event) {
+    // Only handle sf::Event::KeyReleased
+    if (event.type == sf::Event::KeyPressed)
+        return;
+
+    if (event.key.code == sf::Keyboard::Up) // UP
+        mainMenu->move(Menu::UP);
+    if (event.key.code == sf::Keyboard::Down) // DOWN
+        mainMenu->move(Menu::DOWN);
+    if (event.key.code == sf::Keyboard::Enter){ // Enter
+        size_t btnID = mainMenu->click();
+        if (btnID == 0)
+            setState(GAME);
+        else
+            renderWindow.close();
+    }
+}
+
+/**
+ * Getter for the state of the window. If it is running the game, showing the main menu etc.
+ * @return The windows state
+ */
 State Window::getState() const{
     return currentState;
 }
 
+/**
+ * Sets the state of the window
+ * @param newState New state to set.
+ */
 void Window::setState(State newState){
     currentState = newState;
 }

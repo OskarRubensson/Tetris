@@ -1,21 +1,28 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Shape.cpp, 2021-12-18 - 2021-12-18
-// kortfattat vad filen innehåller
+// Shape.cpp, 2021-12-18 - 2022-01-13
+// Contains the implementation of the shape-class functions.
 //
 
 #include "Shape.h"
 #include <algorithm>
 #include <cmath>       /* round */
 
-
+/**
+ * Creates a shape with a certain set of rectangles (2d-vector) and color.
+ * @param squares The squares that the shape consists of
+ * @param color The color of the shape
+ */
 Shape::Shape(std::vector<std::vector<sf::RectangleShape> > squares, sf::Color color):
 squares(std::move(squares)),
 color(color){
     resetProperties();
 }
 
+/**
+ * Resets all properties as they were on initialization
+ */
 void Shape::resetProperties() {
     int row_index = 0;
     std::for_each(squares.begin(), squares.end(), [&](std::vector<sf::RectangleShape>& rows){
@@ -32,10 +39,11 @@ void Shape::resetProperties() {
     });
 }
 
-std::vector<std::vector<sf::RectangleShape> >& Shape::getSquares() {
-    return squares;
-}
-
+/**
+ * Given a certain square inside the shape. Get it's relative position to the middle square.
+ * @param square The square to check against.
+ * @return sf::Vector2<int> that contains the vector between square and the middle-center.
+ */
 sf::Vector2<int> Shape::getRelativeCenterPosition(const sf::RectangleShape* square) {
     for(int rowNo = 0; rowNo < squares.size(); rowNo++){
         for(int colNo = 0; colNo < squares.at(rowNo).size(); colNo++){
@@ -51,31 +59,40 @@ sf::Vector2<int> Shape::getRelativeCenterPosition(const sf::RectangleShape* squa
     return {0, 0};
 }
 
+/**
+ * Draws each square that the shape consists of.
+ * @param target Target to draw upon.
+ * @param states States gotten from transformable-parent
+ */
 void Shape::draw(sf::RenderTarget &target, sf::RenderStates states) const {
-    std::for_each(squares.begin(), squares.end(), [&target](const std::vector<sf::RectangleShape>& rows){
-        std::for_each(rows.begin(), rows.end(), [&target](const sf::RectangleShape& square){
+    std::for_each(squares.begin(), squares.end(), [&target,&states](const std::vector<sf::RectangleShape>& rows){
+        std::for_each(rows.begin(), rows.end(), [&target, &states](const sf::RectangleShape& square){
             if (square.getSize().x > 0 || square.getSize().y > 0)
-                target.draw(square);
+                target.draw(square, states);
         });
     });
 }
 
+/**
+ * Move each square in a given direction.
+ * @param direction sf::Vector2 containing the direction we want to move in.
+ */
 void Shape::move(sf::Vector2<int> direction){
     sf::Vector2<float> parsedDirection = {(float)direction.x * SQUARE_SIZE,
                                           (float)direction.y * SQUARE_SIZE};
 
-    int row_index = 0;
     for(std::vector<sf::RectangleShape>& rows: squares){
-        int col_index = 0;
         for( sf::RectangleShape& square : rows){
             if (square.getSize().x > 0 || square.getSize().y > 0)
                 square.move(parsedDirection);
-            col_index++;
         }
-        row_index++;
     }
 }
 
+/**
+ * Change index of each square inside their 2d-vector so that the vector "rotates".
+ * @param clockwise Rotates clockwise if true, counter-clockwise if not.
+ */
 void Shape::rotate(bool clockwise) {
     std::vector<std::vector<sf::RectangleShape> > rotated_squares{
         squares[0].size(),

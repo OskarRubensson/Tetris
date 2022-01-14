@@ -1,12 +1,11 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Window.cpp, 2021-12-15 - 2021-12-15
-// kortfattat vad filen innehåller
+// Window.cpp, 2021-12-15 - 2022-01-13
+// Contains the implementations of the Window-class' functions.
 //
 
 #include "Window.h"
-#include <iostream>
 
 /**
  * Parametrized constructor. Creates a window with a given width, height & title.
@@ -18,25 +17,27 @@
 Window::Window(int width, int height, const std::string& title)
 :renderWindow(sf::VideoMode(width, height),title),
 game(std::make_unique<Game>()),
-mainMenu(std::make_unique<Menu>(std::vector<std::string>{"Start", "Quit"})),
+mainMenu(std::make_unique<MainMenu>(LOGO_PATH, std::vector<std::string>{"Start", "Quit"})),
 currentState(MAIN_MENU){
     initialization();
 }
 
 /**
- * Initializes the position and size of each screen (game, main menu...)
+ * Initializes the position and size of each main-screens (game, main menu...)
  */
 void Window::initialization() {
     renderWindow.setFramerateLimit(60);
-    mainMenu->setPosition(100, 100);
+    sf::Vector2<float> windowCenter = {
+            (float)renderWindow.getSize().x / 2,
+            (float)renderWindow.getSize().y / 2};
+    mainMenu->setPosition(windowCenter - sf::Vector2<float>{mainMenu->getSize().x / 2, mainMenu->getSize().y});
     game->setScale({1.4f, 1.6f});
-    game->setPosition({
-        (float)renderWindow.getSize().x / 2 - (game->width() / 2),
-        (float)renderWindow.getSize().y / 2 - (game->height() / 2)});
+    game->setPosition(windowCenter - sf::Vector2<float>{game->width() / 2, game->height() / 2});
 }
 
 /**
  * Runs the window, and will keep it running until window is closed.
+ * Also handles any events and starts the recursive "draw"-function of each element.
  */
 void Window::run(){
     while(renderWindow.isOpen()){
@@ -52,7 +53,6 @@ void Window::run(){
                     game = std::make_unique<Game>();
                     initialization();
                     currentState = MAIN_MENU;
-                    break;
                 }
                 game->update();
                 renderWindow.draw(*game);
@@ -144,11 +144,11 @@ void Window::handleMainMenuInput(sf::Event& event) {
         return;
 
     if (event.key.code == sf::Keyboard::Up) // UP
-        mainMenu->move(Menu::UP);
+        mainMenu->menu.move(Menu::UP);
     if (event.key.code == sf::Keyboard::Down) // DOWN
-        mainMenu->move(Menu::DOWN);
+        mainMenu->menu.move(Menu::DOWN);
     if (event.key.code == sf::Keyboard::Enter){ // Enter
-        size_t btnID = mainMenu->click();
+        size_t btnID = mainMenu->menu.click();
         if (btnID == 0)
             setState(GAME);
         else

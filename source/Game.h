@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Game.h, 2021-12-17 - 2021-12-17
-// kortfattat vad filen innehåller
+// Game.h, 2021-12-17 - 2022-01-13
+// Contains the declaration of the Game-class.
 //
 
 #ifndef TETRIS_GAME_H

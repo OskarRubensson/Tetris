@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// LevelHandler.cpp, 2022-01-10 - 2022-01-10
-// kortfattat vad filen innehåller
+// LevelHandler.cpp, 2022-01-10 - 2022-01-13
+// Contains the implementations of the LevelHandler-class' functions.
 //
 
 #include "LevelHandler.h"

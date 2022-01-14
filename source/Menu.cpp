@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Menu.cpp, 2022-01-10 - 2022-01-10
-// kortfattat vad filen innehåller
+// Menu.cpp, 2022-01-10 - 2022-01-13
+// Contains the implementations of the Menu-class' functions.
 //
 
 #include "Menu.h"
@@ -22,6 +22,10 @@ Menu::Menu(std::vector<std::string> buttonStrings, int spacing): spacing(spacing
         if (b->getWidth() > maxWidth)
             maxWidth = b->getWidth();
     }
+
+    // Center all buttons and hoverShape
+    std::for_each(buttons.begin(), buttons.end(), [&maxWidth](const auto& b){ b->move(maxWidth / 4, 0); });
+    hoverShape.move(maxWidth / 4, 0);
 
     // Initialize fadedBackground
     fadedBackground.setSize({100000, 100000});
@@ -62,6 +66,6 @@ void Menu::move(int direction) {
         hoveredBtn = buttons.end() - 1;
     } else
         hoveredBtn += direction;
-    hoverShape.setPosition({0,
+    hoverShape.setPosition({hoverShape.getPosition().x,
                             std::distance(buttons.begin(), hoveredBtn) * (buttons.front()->getHeight() + spacing)});
 }

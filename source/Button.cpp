@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Button.cpp, 2022-01-10 - 2022-01-10
-// kortfattat vad filen innehåller
+// Button.cpp, 2022-01-10 - 2022-01-13
+// Contains the implementations of the Button-class' functions.
 //
 
 #include "Button.h"

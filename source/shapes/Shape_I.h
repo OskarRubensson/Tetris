@@ -2,7 +2,7 @@
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
 // Shape_I.h, 2021-12-25 - 2022-01-13
-// kortfattat vad filen innehåller
+// Contains the declaration of the Shape-class.
 //
 
 #ifndef TETRIS_SHAPE_I_H

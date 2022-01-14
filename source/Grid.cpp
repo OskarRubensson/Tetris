@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Grid.cpp, 2021-12-20 - 2021-12-20
-// kortfattat vad filen innehåller
+// Grid.cpp, 2021-12-20 - 2022-01-13
+// Contains the implementations of the Grid-class' functions.
 //
 
 #include "Grid.h"
@@ -17,6 +17,33 @@
 Grid::Grid(size_t rows, size_t columns):
 grid(rows * columns),
 WIDTH(columns){
+    // Initialize gridLines with line-shapes
+    float lineWidth = 1;
+    sf::Color lineColor(255, 255, 255, 100);
+    sf::RectangleShape verticalLine(sf::Vector2<float>(lineWidth, height() * SQUARE_SIZE));
+    sf::RectangleShape horizontalLine(sf::Vector2<float>(width() * SQUARE_SIZE, lineWidth));
+    verticalLine.setFillColor(lineColor);
+    horizontalLine.setFillColor(lineColor);
+    for(int i = 0; i < rows; i++){
+        horizontalLine.setPosition(-lineWidth / 2, i * SQUARE_SIZE - (lineWidth / 2));
+        gridLines.push_back(horizontalLine);
+    }
+    for(int i = 0; i < columns; i++){
+        verticalLine.setPosition(i * SQUARE_SIZE - (lineWidth / 2), -lineWidth / 2);
+        gridLines.push_back(verticalLine);
+    }
+}
+
+/**
+ * Draws the grid-lines into the game.
+ * @param target Target to draw upon.
+ * @param states States gotten from parent.
+ */
+void Grid::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    states.transform *= getTransform();
+    for(auto& line: gridLines)
+        target.draw(line, states);
+
 }
 
 /**
@@ -114,11 +141,13 @@ bool Grid::move(Shape& s, sf::Vector2<int> direction) {
     if (n == grid.end())
         return false;
 
-    auto position = get(*n);
+    sf::Vector2<int> position;
 
-    // Error checking
-    if (position.x < 0 || position.y < 0)
+    try{
+        position = get(*n);
+    } catch(const std::out_of_range& err){
         return false;
+    }
 
     auto& shape_ptr = n->shape;
 
@@ -179,11 +208,13 @@ bool Grid::move(Shape& s, sf::Vector2<int> direction) {
  */
 bool Grid::rotate(Shape &shape, bool clockwise) {
     node& n = *std::find_if(grid.begin(), grid.end(), [&](node& n_ptr) { return n_ptr.shape == &shape; });
-    auto nPos = get(n);
+    sf::Vector2<int> nPos;
 
-    // No node found
-    if (nPos.x == -1 || nPos.y == -1)
+    try{
+        nPos = get(n);
+    }catch (const std::out_of_range& err){
         return false;
+    }
 
     remove(shape);                        // A rotation should never fail, we can therefore safely remove it
     shape.rotate(clockwise);                 // Rotates all squares in the shape
@@ -217,7 +248,14 @@ bool Grid::rotate(Shape &shape, bool clockwise) {
 bool Grid::isRowEmpty(size_t row){
     int col = 0;
     while(col < width()){
-        if (get({col, (int)row})->shape != nullptr)
+        node* n;
+        try{
+            n = get({col, (int)row});
+        }catch (const std::out_of_range& err) {
+            return false;
+        }
+
+        if (n->shape != nullptr)
             return false;
         col++;
     }
@@ -232,7 +270,14 @@ bool Grid::isRowEmpty(size_t row){
 bool Grid::isRowFull(size_t row){
     int col = 0;
     while(col < width()){
-        if (get({col, (int)row})->shape == nullptr)
+        node* n;
+        try{
+            n = get({col, (int)row});
+        }catch(const std::out_of_range& e){
+            return false;
+        }
+
+        if (n->shape == nullptr)
             break;
         col++;
     }
@@ -257,7 +302,6 @@ size_t Grid::clearFullRows(){
             rows.push_back(row * width());
     }
 
-    // std::for_each(rows.begin(), rows.end(), [&](auto rowID){ clear(rowID); });
     if (!rows.empty()){
         // Clear each row that was full
         clear(grid.begin() + rows.back(), grid.begin() + rows.front() + width());
@@ -276,17 +320,19 @@ size_t Grid::clearFullRows(){
 /**
  * For a given position, return the node-object.
  * @param position The position of the node to get.
+ * @throws out_of_range when not found.
  * @return Returns node at the position. Nullptr if position is invalid.
  */
 node* Grid::get(sf::Vector2<int> position) {
     size_t index = vectorToIndex(position);
     if (grid.size() <= index)
-        return nullptr;
+        throw std::out_of_range("Given index is out of range");
     return &grid.at(index);
 }
 
 /**
  * Getter for finding a given nodes position in the grid.
+ * @throws out_of_range when not found.
  * @param n_ptr Pointer to the node to find.
  * @return Position of the node. {-1, -1} if it wasn't found.
  */
@@ -295,7 +341,7 @@ sf::Vector2<int> Grid::get(node& n_ptr) {
 
     // Not found
     if (found_it == grid.end())
-        return {-1, -1};
+        throw std::out_of_range("Node not in grid");
 
     size_t index = std::distance(grid.begin(), found_it);
     return indexToVector(index);

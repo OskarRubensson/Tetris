@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Clock.cpp, 2021-12-20 - 2021-12-20
-// kortfattat vad filen innehåller
+// Clock.cpp, 2021-12-20 - 2022-01-13
+// Contains the implementations of the Clock-class' functions.
 //
 
 #include "Clock.h"

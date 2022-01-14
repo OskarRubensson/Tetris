@@ -1,7 +1,7 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Game.cpp, 2021-12-17 - 2021-12-17
+// Game.cpp, 2021-12-17 - 2022-01-13
 // This file includes the implementations for the Game-functions
 //
 
@@ -32,6 +32,7 @@ Game::Game(size_t rows, size_t columns):
 grid(std::make_unique<Grid>(rows, columns)),
 pauseMenu({"Resume", "Back to Main Menu"}){
     pauseMenu.setScale({0.7f, 0.7f});
+    pauseMenu.setPosition(-pauseMenu.getSize().x / 2, pauseMenu.getSize().y / 2);
     score.setPosition({0, -SQUARE_SIZE - 10});
     start();
 }
@@ -61,6 +62,8 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     border.setOutlineThickness(SQUARE_SIZE);
     border.setPosition(0, SQUARE_SIZE);
     target.draw(border, states);
+
+    target.draw(*grid, states);
 
     // Draw all shapes
     for(auto& s: shapes){
@@ -185,7 +188,8 @@ void Game::stopMove(){
 void Game::addRandomShape(){
     Shape available[7] {Shape_I(), Shape_J(), Shape_L(), Shape_S(), Shape_SQR(), Shape_T(), Shape_Z()};
     shapes.push_back(available[ rand() % 7 ]);
-    grid->insert(shapes.back(), {static_cast<int>(grid->width() / 2), 0});
+    if (!grid->insert(shapes.back(), {static_cast<int>(grid->width() / 2), 0}))
+        state= GAME_OVER;
     addNewObj = false;
     bottomClock.stop();
 }

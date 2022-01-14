@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Menu.h, 2022-01-10 - 2022-01-10
-// kortfattat vad filen innehåller
+// Menu.h, 2022-01-10 - 2022-01-13
+// Contains the declaration of the Menu-class.
 //
 
 #ifndef TETRIS_MENU_H
@@ -44,6 +44,13 @@ public:
      */
     size_t click() { return std::distance(buttons.begin(), hoveredBtn); }
     void move(int direction);
+    /**
+     * Getter for the menus size.
+     * @return A sf::Vector2<float> of the menus width and height.
+     */
+    sf::Vector2<float> getSize(){
+        return sf::Vector2<float>{buttons.front()->getWidth(), buttons.front()->getHeight() * (float)buttons.size()};
+    }
 };
 
 

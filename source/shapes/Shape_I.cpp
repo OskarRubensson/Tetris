@@ -2,7 +2,7 @@
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
 // Shape_I.cpp, 2021-12-25 - 2022-01-13
-//
+// Contains the implementation of the Shape_I-class' functions.
 //
 
 #include "Shape_I.h"

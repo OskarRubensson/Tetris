@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Score.h, 2022-01-07 - 2022-01-07
-// kortfattat vad filen innehåller
+// Score.h, 2022-01-07 - 2022-01-13
+// Contains the declaration of the Score-class.
 //
 
 #ifndef TETRIS_SCORE_H

@@ -2,7 +2,7 @@
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
 // Shape_SQR.cpp, 2021-12-18 - 2022-01-13
-// kortfattat vad filen innehåller
+// Contains the implementation of the Shape_SQR-class' functions.
 //
 
 #include "Shape_SQR.h"
@@ -15,5 +15,4 @@ Shape({
               {sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE}), sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE})},
               {sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE}), sf::RectangleShape({SQUARE_SIZE, SQUARE_SIZE})}
       }, sf::Color::Yellow){
-
 }

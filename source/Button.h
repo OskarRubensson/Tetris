@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Button.h, 2022-01-10 - 2022-01-10
-// kortfattat vad filen innehåller
+// Button.h, 2022-01-10 - 2022-01-13
+// Contains the declaration of the Button-class.
 //
 
 #ifndef TETRIS_BUTTON_H

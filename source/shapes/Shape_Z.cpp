@@ -2,7 +2,7 @@
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
 // Shape_Z.cpp, 2021-12-19 - 2022-01-13
-// kortfattat vad filen innehåller
+// Contains the implementation of the Shape_Z-class' functions.
 //
 
 #include "Shape_Z.h"

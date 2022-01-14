@@ -5,7 +5,7 @@ project(Tetris)
 set(CMAKE_CXX_STANDARD 17)
 # set(SOURCE_FILES main.cpp)
 
-add_executable(Tetris main.cpp source/Window.cpp source/Window.h source/Game.cpp source/Game.h source/shapes/Shape.h source/shapes/Shape_SQR.cpp source/shapes/Shape_SQR.h source/shapes/Shape.cpp source/shapes/Shape_J.cpp source/shapes/Shape_J.h source/shapes/Shape_L.cpp source/shapes/Shape_L.h source/shapes/Shape_Z.cpp source/shapes/Shape_Z.h source/shapes/Shape_S.cpp source/shapes/Shape_S.h source/shapes/Shape_T.cpp source/shapes/Shape_T.h source/Clock.cpp source/Clock.h source/Grid.cpp source/Grid.h source/shapes/Shape_I.cpp source/shapes/Shape_I.h source/Score.cpp source/Score.h source/LevelHandler.cpp source/LevelHandler.h source/Menu.cpp source/Menu.h source/Button.cpp source/Button.h)
+add_executable(Tetris main.cpp source/Window.cpp source/Window.h source/Game.cpp source/Game.h source/shapes/Shape.h source/shapes/Shape_SQR.cpp source/shapes/Shape_SQR.h source/shapes/Shape.cpp source/shapes/Shape_J.cpp source/shapes/Shape_J.h source/shapes/Shape_L.cpp source/shapes/Shape_L.h source/shapes/Shape_Z.cpp source/shapes/Shape_Z.h source/shapes/Shape_S.cpp source/shapes/Shape_S.h source/shapes/Shape_T.cpp source/shapes/Shape_T.h source/Clock.cpp source/Clock.h source/Grid.cpp source/Grid.h source/shapes/Shape_I.cpp source/shapes/Shape_I.h source/Score.cpp source/Score.h source/LevelHandler.cpp source/LevelHandler.h source/Menu.cpp source/Menu.h source/Button.cpp source/Button.h source/MainMenu.cpp source/MainMenu.h)
 #add_executable(Window ${SOURCE_FILES})
 
 

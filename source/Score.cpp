@@ -1,8 +1,8 @@
 //
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900)
-// Score.cpp, 2022-01-07 - 2022-01-07
-// kortfattat vad filen innehåller
+// Score.cpp, 2022-01-07 - 2022-01-13
+// Contains the implementations of the Score-class' functions.
 //
 
 #include "Score.h"

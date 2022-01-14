@@ -2,7 +2,7 @@
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
 // Shape_SQR.h, 2021-12-18 - 2022-01-13
-// kortfattat vad filen innehåller
+// Contains the declaration of the Shape_SQR-class.
 //
 
 #ifndef TETRIS_SHAPE_SQR_H
@@ -17,6 +17,8 @@
 class Shape_SQR: public Shape {
 public:
     Shape_SQR();
+
+    void rotate(bool clockwise) override { }
 };
 
 

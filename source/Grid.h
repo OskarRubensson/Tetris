@@ -1,8 +1,8 @@
 // 
 // Tetris, Programmeringsmetodik (DT047G)
 // Oskar Rubensson (osru1900) 
-// Grid.h, 2021-12-20 - 2021-12-20
-// kortfattat vad filen innehåller
+// Grid.h, 2021-12-20 - 2022-01-13
+// Contains the declaration of the Grid-class.
 //
 
 #ifndef TETRIS_GRID_H
@@ -28,9 +28,12 @@ struct node {
  * A 2D-grid of nodes for the shapes to position themselves inside.
  * Having them in such a grid simplifies the collision detection-algorithms.
  */
-class Grid {
+class Grid: public sf::Drawable, public sf::Transformable{
     std::vector<node> grid;
     const size_t WIDTH;
+
+    std::vector<sf::RectangleShape> gridLines;
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
     /**
      * Takes iterators pointing on pair of grid-indexes. Swaps pair-first with pair-second.
